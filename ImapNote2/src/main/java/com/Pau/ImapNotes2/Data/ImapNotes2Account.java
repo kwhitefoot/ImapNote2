@@ -28,8 +28,21 @@ public class ImapNotes2Account {
     @Nullable
     private Account account = null;
 
+    @NonNull 
+    public final File dirForNewFiles;
 
-    public ImapNotes2Account() {
+    @NonNull 
+    public final File dirForDeletedFiles;
+
+    @NonNull 
+    public final File rootDir;
+
+    public ImapNotes2Account(@NonNull final Context applicationContext,
+                             @NonNull final String name) {
+        rootDir = new File(applicationContext.getFilesDirectory(), name);
+        dirForNewFiles = new File(rootDir, "new");
+        dirForDeletedFiles = new File(rootDir, "deleted");
+        
     }
 
     @NonNull
