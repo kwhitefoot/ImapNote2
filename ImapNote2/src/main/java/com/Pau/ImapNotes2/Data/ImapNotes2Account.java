@@ -45,6 +45,16 @@ public class ImapNotes2Account {
         
     }
 
+    
+    public ImapNotes2Account(Account account) {
+        this.account = account;
+        Now unpack the contents of account and set the fields.
+    }
+    
+    public ImapNotes2Account(field values) {
+        Now unpack the contents of account and set the fields.
+    }
+    
     @NonNull
     public String toString() {
         return this.accountname + ":" + this.username + ":" + this.password + ":"
