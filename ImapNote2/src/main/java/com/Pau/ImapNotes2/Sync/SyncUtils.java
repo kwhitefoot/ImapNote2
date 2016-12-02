@@ -159,13 +159,14 @@ public class SyncUtils {
     /* Copy all notes from the IMAP server to the local directory using the UID as the file name.
 
      */
-    static void GetNotes(@NonNull Account account,
+    static void GetNotes(@NonNull ImapNotes2Account account,
                          @NonNull Folder imapNotesFolder,
                          @NonNull Context applicationContext,
                          @NonNull NotesDb storedNotes) throws MessagingException, IOException {
         //Long UIDM;
         //Message notesMessage;
-        File directory = new File(applicationContext.getFilesDir(), account.name);
+        //File directory = new File(applicationContext.getFilesDir(), account.name);
+        
         if (imapNotesFolder.isOpen()) {
             if ((imapNotesFolder.getMode() & Folder.READ_ONLY) != 0)
                 imapNotesFolder.open(Folder.READ_ONLY);
@@ -183,7 +184,7 @@ public class SyncUtils {
             // filename is the original message uid
             Long UIDM = ((IMAPFolder) imapNotesFolder).getUID(notesMessage);
             String suid = UIDM.toString();
-            File outfile = new File(directory, suid);
+            File outfile = new File(account.dirForNewFiles, suid);
             SaveNoteAndUpdatDatabase(outfile, notesMessage, storedNotes, account.name, suid);
         }
     }
