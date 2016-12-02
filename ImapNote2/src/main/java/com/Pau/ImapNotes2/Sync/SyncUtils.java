@@ -159,13 +159,14 @@ public class SyncUtils {
     /* Copy all notes from the IMAP server to the local directory using the UID as the file name.
 
      */
-    static void GetNotes(@NonNull Account account,
+    static void GetNotes(@NonNull ImapNotes2Account account,
                          @NonNull Folder imapNotesFolder,
                          @NonNull Context applicationContext,
                          @NonNull NotesDb storedNotes) throws MessagingException, IOException {
         //Long UIDM;
         //Message notesMessage;
-        File directory = new File(applicationContext.getFilesDir(), account.name);
+        //File directory = new File(applicationContext.getFilesDir(), account.name);
+        
         if (imapNotesFolder.isOpen()) {
             if ((imapNotesFolder.getMode() & Folder.READ_ONLY) != 0)
                 imapNotesFolder.open(Folder.READ_ONLY);
@@ -183,7 +184,7 @@ public class SyncUtils {
             // filename is the original message uid
             Long UIDM = ((IMAPFolder) imapNotesFolder).getUID(notesMessage);
             String suid = UIDM.toString();
-            File outfile = new File(directory, suid);
+            File outfile = new File(account.dirForNewFiles, suid);
             SaveNoteAndUpdatDatabase(outfile, notesMessage, storedNotes, account.name, suid);
         }
     }
@@ -285,10 +286,10 @@ public class SyncUtils {
     }
 
     // Put values in shared preferences
-    static void SetUIDValidity(@NonNull Account account,
+    static void SetUIDValidity(@NonNull String accountName,
                                Long UIDValidity,
                                @NonNull Context ctx) {
-        SharedPreferences preferences = ctx.getSharedPreferences(account.name, Context.MODE_MULTI_PROCESS);
+        SharedPreferences preferences = ctx.getSharedPreferences(accounName, Context.MODE_MULTI_PROCESS);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("Name", "valid_data");
         //Log.d(TAG, "UIDValidity set to in shared_prefs:"+UIDValidity);
@@ -297,10 +298,10 @@ public class SyncUtils {
     }
 
     // Retrieve values from shared preferences:
-    static Long GetUIDValidity(@NonNull Account account,
+    static Long GetUIDValidity(@NonNull String accountName,
                                @NonNull Context ctx) {
         UIDValidity = (long) -1;
-        SharedPreferences preferences = ctx.getSharedPreferences(account.name, Context.MODE_MULTI_PROCESS);
+        SharedPreferences preferences = ctx.getSharedPreferences(accountName, Context.MODE_MULTI_PROCESS);
         String name = preferences.getString("Name", "");
         if (!name.equalsIgnoreCase("")) {
             UIDValidity = preferences.getLong("UIDValidity", -1);
@@ -474,8 +475,9 @@ public class SyncUtils {
         return ((IMAPFolder) notesFolder).appendUIDMessages(message);
     }
 
-    public static void ClearHomeDir(@NonNull Account account, @NonNull Context ctx) {
-        File directory = new File(ctx.getFilesDir() + "/" + account.name);
+    public static void ClearHomeDir(@NonNull String accountName,
+                                    @NonNull Context ctx) {
+        File directory = new File(ctx.getFilesDir(), accountName);
         try {
             FileUtils.deleteDirectory(directory);
         } catch (IOException e) {
@@ -484,6 +486,7 @@ public class SyncUtils {
         }
     }
 
+    // TODO: Move this to ImapNotes2Account
     /**
      * Do we really need the Context argument or could we call getApplicationContext instead?
      *
@@ -491,7 +494,8 @@ public class SyncUtils {
      * @param applicationContext Global context not an activity context.
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void CreateLocalDirectories(@NonNull String accountName, @NonNull Context applicationContext) {
+    public static void CreateLocalDirectories(@NonNull String accountName,
+                                              @NonNull Context applicationContext) {
         Log.d(TAG, "CreateDirs(String: " + accountName);
         File dir = new File(applicationContext.getFilesDir(), accountName);
         //File directory = new File(stringDir);
