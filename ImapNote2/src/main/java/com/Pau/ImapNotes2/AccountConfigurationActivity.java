@@ -53,7 +53,7 @@ public class AccountConfigurationActivity extends AccountAuthenticatorActivity i
     private CheckBox stickyCheckBox;
     private Spinner securitySpinner;
     // TODO: move this to dologin becauae it is the only use.
-    private ImapNotes2Account imapNotes2Account;
+    //private ImapNotes2Account imapNotes2Account;
     @NonNull
     private Security security = Security.None;
     //private int security_i;
@@ -249,15 +249,16 @@ public class AccountConfigurationActivity extends AccountAuthenticatorActivity i
     private void DoLogin() {
         ProgressDialog loadingDialog = ProgressDialog.show(this, getString(R.string.app_name),
                 getString(R.string.logging_in), true);
-        imapNotes2Account.SetAccountname(GetTextViewText(accountnameTextView));
-        imapNotes2Account.SetUsername(GetTextViewText(usernameTextView));
-        imapNotes2Account.SetPassword(GetTextViewText(passwordTextView));
-        imapNotes2Account.SetServer(GetTextViewText(serverTextView));
-        imapNotes2Account.SetPortnum(GetTextViewText(portnumTextView));
-        imapNotes2Account.SetSecurity(security);
-        imapNotes2Account.SetUsesticky(stickyCheckBox.isChecked());
-        imapNotes2Account.SetSyncinterval(GetTextViewText(syncintervalTextView));
-        imapNotes2Account.SetFoldername(GetTextViewText(folderTextView));
+        final ImapNotes2Account imapNotes2Account = new ImapNotes2Account( 
+            GetTextViewText(accountnameTextView),
+            GetTextViewText(usernameTextView),
+            GetTextViewText(passwordTextView),
+            GetTextViewText(serverTextView),
+            imapNotes2Account.SetPortnum(GetTextViewText(portnumTextView),
+            imapNotes2Account.SetSecurity(security),
+            stickyCheckBox.isChecked()),
+            GetTextViewText(syncintervalTextView)),
+            imapNotes2Account.SetFoldername(GetTextViewText(folderTextView)))
         // No need to check for valid numbers because the field only allows digits.  But it is
         // possible to remove all characters which causes the program to crash.  The easiest fix is
         // to add a zero at the beginning so that we are guaranteed to be able to parse it but that
